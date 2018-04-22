@@ -46,10 +46,8 @@ void DFS_odwiedz(int wierzcholek, queue <int> &kolejka, vector<bool> &sprawdzone
     {
         if(wyszukaj_poczatek(graf,graf[wierzcholek].ends[i]) != -1)
         {
-            //cout<<"jestem przed ifem, szukam "<<graf[wierzcholek].ends[i]<<endl;
             if(!sprawdzone[ wyszukaj_poczatek(graf,graf[wierzcholek].ends[i]) ])
             {
-                //cout<<"jestem w ifie"<<endl;
                 kolejka.push( wyszukaj_poczatek(graf,graf[wierzcholek].ends[i]) );
             }
         }
@@ -74,7 +72,6 @@ int main()
     int case_number = 1,
         first_point, second_point,
         arc_count;
-
 
     while(cin>>first_point>>second_point && (first_point>=0 && second_point>=0))
     {
@@ -105,19 +102,21 @@ int main()
                 wierzcholki.insert(second_point);
                 arc_count++;
             }
-            //cout<<"graf:"<<endl;
+            /*
+            cout<<"graf:"<<endl;
             for(int g=0;g<graf.size();g++)
             {
-                /*
+
                 cout<<"Start: "<<graf[g].start<<endl;
                 for(int h=0;h<graf[g].ends.size();++h)
                 {
                     cout<<graf[g].ends[h]<<" ";
                 }
                 cout<<endl;
-                */
+
             }
-            //cout<<"vertex,arc: "<<wierzcholki.size()<<" "<<arc_count<<endl;
+            cout<<"vertex,arc: "<<wierzcholki.size()<<" "<<arc_count<<endl;
+            */
             cin>>first_point>>second_point;
         }
         if(wierzcholki.size()-1 != arc_count) jest = false;
@@ -135,7 +134,6 @@ int main()
         if(jest || wierzcholki.empty()) cout<<" is a tree."<<endl;
         else cout<<" is not a tree."<<endl;
     }
-
 
     return 0;
 }
