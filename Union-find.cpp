@@ -3,7 +3,7 @@
 #include<algorithm>
 using namespace std;
 
-class Edge
+struct Edge
 {
 public:
     int edge_start,edge_end;
@@ -49,100 +49,21 @@ void DS_struct::UnionSets(Edge e)
 {
   int rep_u,rep_v;
 
-  rep_u = FindSet(e.edge_start);             // Wyznaczamy korzeñ drzewa z wêz³em u
-  rep_v = FindSet(e.edge_end);             // Wyznaczamy korzeñ drzewa z wêz³em v
-  if(rep_u != rep_v)                    // Korzenie musz¹ byæ ró¿ne
+  rep_u = FindSet(e.edge_start);             // wyznaczamy korzen drzewa z wezlem u
+  rep_v = FindSet(e.edge_end);             //wyznaczamy korzen drzewa z wezlem v
+  if(rep_u != rep_v)                    // korzenie musza byc rozne, inaczej to ten sam zbior
   {
-    if(nodes[rep_u].set_rank > nodes[rep_v].set_rank)   // Porównujemy rangi drzew
-      nodes[rep_v].representative = rep_u;              // ru wiêksze, do³¹czamy rv
+    if(nodes[rep_u].set_rank > nodes[rep_v].set_rank)   // porownujemy rangi drzew
+      nodes[rep_v].representative = rep_u;              // rep_u wieksze, dolaczamy rep_v
     else
     {
-      nodes[rep_u].representative = rep_v;              // równe lub rv wiêksze, do³¹czamy ru
+      nodes[rep_u].representative = rep_v;              // równe lub rep_v wiêksze, dolaczamy ru
       if(nodes[rep_u].set_rank == nodes[rep_v].set_rank) nodes[rep_v].set_rank++;
     }
   }
 }
 
-bool Weight_compare(Edge a,Edge b) {return a.weight<b.weight;}
-
 int main()
 {
-    int sum_of_weights = 0;
-
-    vector<Edge> edges;
-    vector<Edge> minimal_spanning_tree;
-    int number_of_edges,number_of_vertexes,edge_start,edge_end,edge_weight;
-    cin>>number_of_vertexes>>number_of_edges;
-
-    DS_struct universe(number_of_vertexes);
-    int i;
-    for(i = 0; i < number_of_vertexes; i++)
-    {
-        universe.MakeSet(i);
-    }
-    // sort all elements
-    for(i=0;i<number_of_edges;++i)
-    {
-        Edge _temp;
-        cin>>edge_start>>edge_end>>edge_weight;
-        _temp.edge_start = edge_start;
-        _temp.edge_end = edge_end;
-        _temp.weight = edge_weight;
-        edges.push_back(_temp);
-    }
-    sort(edges.begin(),edges.end(),Weight_compare);
-    /*
-    for(i=0;i<edges.size();++i)
-    {
-        cout<<"Edge "<<i+1<<": "<<edges[i].edge_start<<" "<<edges[i].edge_end<<" "<<edges[i].weight<<endl;
-    }
-    */
-    i=1;
-    while(i<number_of_edges)
-    {
-        Edge curr_edge;
-        do
-        {
-            if(i>=number_of_edges) break;
-            curr_edge = edges[i]; // Pobieram krawêdŸ
-            //cout<<"Current "<<i<<": "<<curr_edge.edge_start<<" "<<curr_edge.edge_end<<" "<<curr_edge.weight<<endl;
-            i++;
-
-        } while(universe.FindSet(curr_edge.edge_start) == universe.FindSet(curr_edge.edge_end));
-        minimal_spanning_tree.push_back(curr_edge);                 // Dodaje krawêdŸ do drzewa
-        universe.UnionSets(curr_edge);               // Zbiory z wierzcho³kami ³¹cze ze sob¹
-        sum_of_weights += curr_edge.weight;
-    }
-
-    cout<<"Sum of weights: "<<sum_of_weights<<endl;
-    cout<<"Min spanning tree:"<<endl;
-    for(i=0;i<minimal_spanning_tree.size();++i)
-    {
-        cout<<"Edge "<<i+1<<": "<<minimal_spanning_tree[i].edge_start<<" "<<minimal_spanning_tree[i].edge_end<<" "<<minimal_spanning_tree[i].weight<<endl;
-    }
-
     return 0;
-    /* Dane testowe
-11 20
-1 4 2
-8 7 3
-10 0 3
-10 2 5
-8 0 6
-4 6 6
-10 1 7
-7 6 7
-9 10 8
-5 6 8
-0 1 8
-0 6 9
-2 3 9
-0 7 10
-2 1 10
-5 4 10
-9 8 10
-9 0 12
-3 5 12
-4 3 13
-    */
 }
