@@ -4,7 +4,7 @@
 #include<set>
 using namespace std;
 
-class Node
+struct Node
 {
 public:
     int start;
@@ -13,7 +13,7 @@ public:
 int wyszukaj_poczatek(vector<Node>graf,int start) /// zwraca indeks wierzcholka w grafie lub -1
 {
     int i;
-    for(i=0;i<graf.size();++i)
+    for(i=0;i<(int)graf.size();++i)
     {
         if(start == graf[i].start) return i;
     }
@@ -25,9 +25,9 @@ int znajdz_korzen(vector<Node>graf,set<int>wierzcholki)
     set <int> konce;
     std::set<int>::iterator it;
     int i,j;
-    for(i=0;i<graf.size();++i)
+    for(i=0;i<(int)graf.size();++i)
     {
-        for(j=0;j<graf[i].ends.size();++j)
+        for(j=0;j<(int)graf[i].ends.size();++j)
         {
             konce.insert(graf[i].ends[j]);
         }
@@ -42,7 +42,7 @@ int znajdz_korzen(vector<Node>graf,set<int>wierzcholki)
 void DFS_odwiedz(int wierzcholek, queue <int> &kolejka, vector<bool> &sprawdzone,vector<Node> graf)
 {
     int i;
-    for(i = 0;i<graf[wierzcholek].ends.size();++i) // dla kazdego dziecka danego wierzcholka
+    for(i = 0;i<(int)graf[wierzcholek].ends.size();++i) // dla kazdego dziecka danego wierzcholka
     {
         if(wyszukaj_poczatek(graf,graf[wierzcholek].ends[i]) != -1)
         {
@@ -59,7 +59,6 @@ void DFS_odwiedz(int wierzcholek, queue <int> &kolejka, vector<bool> &sprawdzone
 void DFS(vector<bool> &sprawdzone,vector<Node> graf,int korzen)
 {
     queue <int> kolejka;
-    int i;
     kolejka.push(korzen);
     while(!kolejka.empty())
     {
@@ -119,12 +118,12 @@ int main()
             */
             cin>>first_point>>second_point;
         }
-        if(wierzcholki.size()-1 != arc_count) jest = false;
+        if((int)wierzcholki.size()-1 != arc_count) jest = false;
         else
         {
             DFS(sprawdzone,graf,wyszukaj_poczatek(graf,znajdz_korzen(graf,wierzcholki)));
             int j;
-            for(j=0;j<sprawdzone.size();++j)
+            for(j=0;j<(int)sprawdzone.size();++j)
             {
                 jest = jest && sprawdzone[j];
             }

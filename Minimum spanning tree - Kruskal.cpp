@@ -91,32 +91,41 @@ int main()
     }
     sort(edges.begin(),edges.end(),Weight_compare);
     /*
-    for(i=0;i<edges.size();++i)
+    for(i=0;i<(int)edges.size();++i)
     {
-        cout<<"Edge "<<i+1<<": "<<edges[i].edge_start<<" "<<edges[i].edge_end<<" "<<edges[i].weight<<endl;
+        cout<<"Edge "<<i<<": "<<edges[i].edge_start<<" "<<edges[i].edge_end<<" "<<edges[i].weight<<endl;
     }
     */
-    i=1;
+    i=0;
     while(i<number_of_edges)
     {
         Edge curr_edge;
+        bool do_not_add = false;
         do
         {
-            if(i>=number_of_edges) break;
+            if(i>=number_of_edges)
+            {
+                do_not_add = true;
+                break;
+            }
             curr_edge = edges[i]; // podbranie kolejnych krawedzi
             i++;
-
+            //cout<<"Current edge "<<i<<": "<<curr_edge.edge_start<<" "<<curr_edge.edge_end<<" "<<curr_edge.weight<<endl;
+            //cout<<universe.FindSet(curr_edge.edge_start)<<" "<<universe.FindSet(curr_edge.edge_end)<<endl;
         } while(universe.FindSet(curr_edge.edge_start) == universe.FindSet(curr_edge.edge_end)); // dopoki tworza cykl to pobieraj nowe
-        minimum_spanning_tree.push_back(curr_edge);                 // dodawanie krawedzi do minimalnego drzewa rozpinajacego
-        universe.UnionSets(curr_edge);               // laczenie zbiorow ze soba
-        sum_of_weights += curr_edge.weight;
+        if(!do_not_add)
+        {
+            minimum_spanning_tree.push_back(curr_edge);                 // dodawanie krawedzi do minimalnego drzewa rozpinajacego
+            universe.UnionSets(curr_edge);               // laczenie zbiorow ze soba
+            sum_of_weights += curr_edge.weight;
+        }
     }
 
     cout<<"Sum of weights: "<<sum_of_weights<<endl;
     cout<<"Min spanning tree:"<<endl;
-    for(i=0;i<minimum_spanning_tree.size();++i)
+    for(i=0;i<(int)minimum_spanning_tree.size();++i)
     {
-        cout<<"Edge "<<i+1<<": "<<minimum_spanning_tree[i].edge_start<<" "<<minimum_spanning_tree[i].edge_end<<" "<<minimum_spanning_tree[i].weight<<endl;
+        cout<<"Edge "<<i<<": "<<minimum_spanning_tree[i].edge_start<<" "<<minimum_spanning_tree[i].edge_end<<" "<<minimum_spanning_tree[i].weight<<endl;
     }
 
     return 0;
@@ -128,8 +137,8 @@ int main()
 10 2 5
 8 0 6
 4 6 6
-10 1 7
 7 6 7
+10 1 7
 9 10 8
 5 6 8
 0 1 8
