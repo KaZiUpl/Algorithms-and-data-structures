@@ -1,6 +1,6 @@
 #include<iostream>
 #include<vector>
-#include<queue>
+#include<stack>
 using namespace std;
 
 struct Node
@@ -19,7 +19,7 @@ int wyszukaj_poczatek(vector<Node>graf,int start) /// zwraca indeks wierzcholka 
     }
     return -1;
 }
-void DFS_odwiedz(int wierzcholek, queue <int> &kolejka, vector<bool> &sprawdzone,vector<Node> graf)
+void DFS_odwiedz(int wierzcholek, stack <int> &kolejka, vector<bool> &sprawdzone,vector<Node> graf)
 {
     int i;
     for(i = 0;i<(int)graf[wierzcholek].ends.size();++i) // dla kazdego dziecka danego wierzcholka
@@ -38,11 +38,11 @@ void DFS_odwiedz(int wierzcholek, queue <int> &kolejka, vector<bool> &sprawdzone
 }
 void DFS(vector<bool> &sprawdzone,vector<Node> graf,int korzen)
 {
-    queue <int> kolejka;
-    kolejka.push(korzen);
-    while(!kolejka.empty())
+    stack <int> stos;
+    stos.push(korzen);
+    while(!stos.empty())
     {
-        DFS_odwiedz(kolejka.front(),kolejka,sprawdzone,graf);
+        DFS_odwiedz(stos.top(),stos,sprawdzone,graf);
     }
 }
 int main()
@@ -51,3 +51,4 @@ int main()
 
     return 0;
 }
+
