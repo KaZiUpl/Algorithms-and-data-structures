@@ -44,7 +44,7 @@ int main()
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
-	// tworzenie krawedzi grafu pelnego zlozonego z podanych wierzcholkow, jest in n(n-1)/2
+	// tworzenie krawedzi grafu pelnego zlozonego z podanych wierzcholkow, jest ich n(n-1)/2
 	vector<Krawedz> graf_pelny;
 	FOR(i, 0, SIZE(wierzcholki))
 	{
@@ -54,23 +54,18 @@ int main()
 		}
 	}
 
-	cout << "Tworzenie krawedzi zakonczone, wcisnij Enter" << endl;
+	/*cout << "Tworzenie krawedzi zakonczone, wcisnij Enter aby stworzyc MST" << endl;
+	_getch();*/
 
 	// sortowanie krawedzi wedlug dlugosci
 	sort(graf_pelny.begin(), graf_pelny.end(), porownaj_krawedzie);
-	/*FOR(i, 0, SIZE(graf_pelny))
-	{
-		cout << "ODL: " << graf_pelny[i].odleglosc << "\t\t";
-		cout << "ID1: " << graf_pelny[i].pierwszy.identyfikator << ", " << graf_pelny[i].pierwszy.x << " " << graf_pelny[i].pierwszy.y << "\t";
-		cout << "ID2: " << graf_pelny[i].drugi.identyfikator << ", " << graf_pelny[i].drugi.x << " " << graf_pelny[i].drugi.y << endl;
-	}*/
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
 	// tworzenie struktury zbiorow rozlacznych zawierajacej wszystkie wierzcholki
-	cout << "Przed DS" << endl;
 	DS_struct zbior_rozlaczny(liczba_wierzcholkow + 1);
-	FOReq(i, 1, liczba_wierzcholkow + 1)
+
+	FOR(i, 1, liczba_wierzcholkow + 1)
 	{
 		zbior_rozlaczny.Make_set(i);
 	}
@@ -78,7 +73,6 @@ int main()
 	vector<Krawedz> MST;
 
 	// wyznaczanie minimalnego drzewa rozpinajacego
-	cout << "Po DS.Make_set" << endl;
 	i = 0;
 	while (i < SIZE(graf_pelny))
 	{
@@ -95,7 +89,6 @@ int main()
 			// pobranie kolejnej krawedzi
 			curr_edge.edge_start = graf_pelny[i].pierwszy.identyfikator;
 			curr_edge.edge_end = graf_pelny[i].drugi.identyfikator;
-			/*cout << "Egde_start: " << curr_edge.edge_start << "\tEgde_end: " << curr_edge.edge_end << endl;*/
 			i++;
 		} while (zbior_rozlaczny.Find(curr_edge.edge_start) == zbior_rozlaczny.Find(curr_edge.edge_end)); // dopoki tworza cykl to pobieraj nowe
 
@@ -104,25 +97,29 @@ int main()
 		zbior_rozlaczny.Union(curr_edge);       // laczenie zbiorow ze soba
 
 	}
-	cout << "MST stworzone, wypisuje:" << endl;
-	_getch();
+	// -------------------------------------------------------------------------------------- //
+	// -------------------------------------------------------------------------------------- //
+	// -------------------------------------------------------------------------------------- //
 
+	/*cout << endl << "MST stworzone, wcisnij dowolny klawisz, aby wypisac MST" << endl;
+	_getch();*/
 
 	FOR(i, 0, SIZE(MST))
 	{
 		cout << MST[i].pierwszy.identyfikator << " ------> " << MST[i].drugi.identyfikator << endl;
 	}
 
-
-
-	int cos;
-	cin >> cos;
+	_getch();
 	return 0;
+
+
 	/*
 	wypisz krawedzie grafu pelnego
 	FOR(i, 0, SIZE(graf_pelny))
 	{
-		graf_pelny[i].wypisz_krawedz();
+		cout << "ODL: " << graf_pelny[i].odleglosc << "\t\t";
+		cout << "ID1: " << graf_pelny[i].pierwszy.identyfikator << ", " << graf_pelny[i].pierwszy.x << " " << graf_pelny[i].pierwszy.y << "\t";
+		cout << "ID2: " << graf_pelny[i].drugi.identyfikator << ", " << graf_pelny[i].drugi.x << " " << graf_pelny[i].drugi.y << endl;
 	}
 
 
