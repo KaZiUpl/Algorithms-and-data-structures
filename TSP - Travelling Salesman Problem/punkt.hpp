@@ -16,7 +16,7 @@ void Punkt::wypisz_punkt()
 
 
 //----------------------------------------------- //
-Punkt stworz_punkt(int id, int a, int b)
+Punkt stworz_punkt(int id, double a, double b)
 {
 	Punkt _temp;
 	_temp.x = a;

@@ -4,7 +4,6 @@
 #include<queue>
 #include<algorithm>
 #include<conio.h>
-
 #include"punkt.hpp"
 #include"krawedz.hpp"
 #include"union_find.hpp"
@@ -14,14 +13,16 @@ using namespace std;
 #define FORd(i,a,b) for(i=a;i>b;--i)
 #define FOReq(i,a,b) for(i=a;i<=b;++i)
 #define FORdeq(i,a,b) for(i=a;i>=b;--i)
+// zmienne
+#define PI (2*acos(0))
 // definicje do wektorow
 #define SIZE(x) (int)x.size()
 #define PB(x) push_back(x)
 
-
-
 double odleglosc(Punkt, Punkt);
 bool porownaj_krawedzie(Krawedz, Krawedz);
+double kat_pomiedzy(Punkt pierwszy, Punkt drugi, Punkt trzeci);
+
 
 int main()
 {
@@ -77,7 +78,6 @@ int main()
 	while (i < SIZE(graf_pelny))
 	{
 		Edge curr_edge;
-
 		bool do_not_add = false;
 		do
 		{
@@ -87,26 +87,26 @@ int main()
 				break;
 			}
 			// pobranie kolejnej krawedzi
-			curr_edge.edge_start = graf_pelny[i].pierwszy.identyfikator;
-			curr_edge.edge_end = graf_pelny[i].drugi.identyfikator;
+			curr_edge.edge_start = graf_pelny[i].pierwszy.identyfikator, curr_edge.edge_end = graf_pelny[i].drugi.identyfikator;
 			i++;
 		} while (zbior_rozlaczny.Find(curr_edge.edge_start) == zbior_rozlaczny.Find(curr_edge.edge_end)); // dopoki tworza cykl to pobieraj nowe
-
 		if (do_not_add) break;
 		MST.PB(graf_pelny[i]);					// dodawanie krawedzi do minimalnego drzewa rozpinajacego
 		zbior_rozlaczny.Union(curr_edge);       // laczenie zbiorow ze soba
-
 	}
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
 
-	/*cout << endl << "MST stworzone, wcisnij dowolny klawisz, aby wypisac MST" << endl;
-	_getch();*/
+	cout << endl << "MST stworzone, wcisnij dowolny klawisz, aby wypisac MST i skasowac graf pelny" << endl;
+	_getch();
+
+	// kasowanie grafu pelnego
+	vector<Krawedz>().swap(graf_pelny);
 
 	FOR(i, 0, SIZE(MST))
 	{
-		cout << MST[i].pierwszy.identyfikator << " ------> " << MST[i].drugi.identyfikator << endl;
+		cout << MST[i].pierwszy.identyfikator << " <-----> " << MST[i].drugi.identyfikator << endl;
 	}
 
 	_getch();
@@ -121,7 +121,6 @@ int main()
 		cout << "ID1: " << graf_pelny[i].pierwszy.identyfikator << ", " << graf_pelny[i].pierwszy.x << " " << graf_pelny[i].pierwszy.y << "\t";
 		cout << "ID2: " << graf_pelny[i].drugi.identyfikator << ", " << graf_pelny[i].drugi.x << " " << graf_pelny[i].drugi.y << endl;
 	}
-
 
 	wypisz punkty
 	FOReq(i,1,liczba_wierzcholkow)
@@ -147,3 +146,28 @@ bool porownaj_krawedzie(Krawedz pierwsza, Krawedz druga)
 	if (druga.odleglosc > pierwsza.odleglosc) return 1;
 	else return 0;
 }
+double kat_pomiedzy(Punkt pierwszy, Punkt drugi, Punkt trzeci)
+{
+	double wynik = (atan2(drugi.y - pierwszy.y, drugi.x - pierwszy.x) - atan2(trzeci.y - drugi.y, trzeci.x - drugi.x)) * 180 / PI;
+	if (wynik > 180) return wynik - 360;
+	return wynik;
+}
+/*
+zasada dzialania kat_pomiedzy:
+zwraca wartosc kata alfa e(-180,180) lezacego pomiedzy AB i BC (kat wewnetrzny)
+
+Punkt pierwszy = stworz_punkt(0, 5, 0);
+Punkt drugi = stworz_punkt(0, 1, 0);
+Punkt trzeci = stworz_punkt(0, 1, -4);
+
+cout << "KAT ROWNY: " << kat_pomiedzy(pierwszy, drugi, trzeci) << endl;
+
+for (double h = 0; h < 2 * PI; h += PI / 180)
+{
+trzeci.x = 5 * cos(h);
+trzeci.y = 5 * sin(h);
+cout << "KAT ROWNY: " << kat_pomiedzy(pierwszy, drugi, trzeci) << " h: " << h * 180 / PI << "\t";
+cout << trzeci.x << " " << trzeci.y << endl;
+}
+
+*/
