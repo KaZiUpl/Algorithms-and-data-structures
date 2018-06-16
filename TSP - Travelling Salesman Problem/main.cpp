@@ -1,7 +1,7 @@
 #include<iostream>
 #include<cmath>
 #include<vector>
-#include<queue>
+#include<stack>
 #include<algorithm>
 #include<conio.h>
 #include"punkt.hpp"
@@ -22,6 +22,8 @@ using namespace std;
 double odleglosc(Punkt, Punkt);
 bool porownaj_krawedzie(Krawedz, Krawedz);
 double kat_pomiedzy(Punkt pierwszy, Punkt drugi, Punkt trzeci);
+vector <Punkt> stworz_poczatkowa_sciezke(vector <vector<Punkt> > &);
+void algorytm_2_opt(vector<Punkt> &);
 
 
 int main()
@@ -34,6 +36,7 @@ int main()
 
 	// podawanie liczby wierzcholkow w grafie, tworzenie wektora na wierzcholki
 	cin >> liczba_wierzcholkow;
+	// vector wierzcholkow
 	vector<Punkt> wierzcholki(liczba_wierzcholkow);
 	// podawanie wsporzednych wierzcholkow
 	FOR(i, 0, liczba_wierzcholkow)
@@ -45,7 +48,7 @@ int main()
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
-	// tworzenie krawedzi grafu pelnego zlozonego z podanych wierzcholkow, jest ich n(n-1)/2
+	//graf pelny zlozony z podanych wierzcholkow
 	vector<Krawedz> graf_pelny;
 	FOR(i, 0, SIZE(wierzcholki))
 	{
@@ -55,22 +58,23 @@ int main()
 		}
 	}
 
-	/*cout << "Tworzenie krawedzi zakonczone, wcisnij Enter aby stworzyc MST" << endl;
-	_getch();*/
+	cout << "Tworzenie krawedzi zakonczone, wcisnij Enter aby stworzyc MST" << endl;
+	_getch();
 
 	// sortowanie krawedzi wedlug dlugosci
 	sort(graf_pelny.begin(), graf_pelny.end(), porownaj_krawedzie);
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
-	// tworzenie struktury zbiorow rozlacznych zawierajacej wszystkie wierzcholki
+
+	//struktura zbiorow rozlacznych zawierajaca wszystkie wierzcholki
 	DS_struct zbior_rozlaczny(liczba_wierzcholkow + 1);
 
 	FOR(i, 1, liczba_wierzcholkow + 1)
 	{
 		zbior_rozlaczny.Make_set(i);
 	}
-	// tworzenie minimalnego drzewa rozpinajacego
+	//minimalne drzewo rozpinajace
 	vector<Krawedz> MST;
 
 	// wyznaczanie minimalnego drzewa rozpinajacego
@@ -86,12 +90,11 @@ int main()
 				do_not_add = true;
 				break;
 			}
-			// pobranie kolejnej krawedzi
 			curr_edge.edge_start = graf_pelny[i].pierwszy.identyfikator, curr_edge.edge_end = graf_pelny[i].drugi.identyfikator;
 			i++;
 		} while (zbior_rozlaczny.Find(curr_edge.edge_start) == zbior_rozlaczny.Find(curr_edge.edge_end)); // dopoki tworza cykl to pobieraj nowe
 		if (do_not_add) break;
-		MST.PB(graf_pelny[i]);					// dodawanie krawedzi do minimalnego drzewa rozpinajacego
+		MST.PB(graf_pelny[i - 1]);					// dodawanie krawedzi do minimalnego drzewa rozpinajacego, rekompensata za identyfikator (inaczej nie dziala)
 		zbior_rozlaczny.Union(curr_edge);       // laczenie zbiorow ze soba
 	}
 	// -------------------------------------------------------------------------------------- //
@@ -104,70 +107,186 @@ int main()
 	// kasowanie grafu pelnego
 	vector<Krawedz>().swap(graf_pelny);
 
+	cout << endl << "Tworzenie listy sasiedztwa, nacisnij przycisk" << endl;
+	_getch();
+	// lista sasiedztwa dla MST
+	vector<vector<Punkt> > lista_sasiedztwa;
+	// pierwszy przebieg dodaje wierzcholki startowe i koncowe
+	FOR(i, 0, SIZE(MST)) // dla kazdej krawedzi z drzewa rozpinajacego
+	{
+		bool czy_jest = false;
+		FOR(j, 0, SIZE(lista_sasiedztwa)) // przejdz przez liste sasiedztwa
+		{
+			if (MST[i].pierwszy == lista_sasiedztwa[j][0]) // jezeli znajdziesz juz taki punkt to nic nie rob
+			{
+				lista_sasiedztwa[j].PB(MST[i].drugi);
+				czy_jest = true;
+				break;
+			}
+		}
+		if (!czy_jest) // jezeli nie znalazl takiego wierzcholka poczatkowego, to go dodaj, dodaj tez koniec krawedzi
+		{
+			vector <Punkt> _temp;
+			_temp.PB(MST[i].pierwszy);
+			_temp.PB(MST[i].drugi);
+			lista_sasiedztwa.PB(_temp);
+		}
+	}
+	// drugi dodaje krawedzie w druga strone
 	FOR(i, 0, SIZE(MST))
 	{
-		cout << MST[i].pierwszy.identyfikator << " <-----> " << MST[i].drugi.identyfikator << endl;
+		bool czy_jest = false;
+		FOR(j, 0, SIZE(lista_sasiedztwa))
+		{
+			if (MST[i].drugi == lista_sasiedztwa[j][0])
+			{
+				lista_sasiedztwa[j].PB(MST[i].pierwszy);
+				czy_jest = true;
+				break;
+			}
+		}
+		if (!czy_jest)
+		{
+			vector<Punkt> _temp;
+			_temp.PB(MST[i].drugi);
+			_temp.PB(MST[i].pierwszy);
+			lista_sasiedztwa.PB(_temp);
+		}
 	}
+	// wypisywanie listy sasiedztwa
+	FOR(i, 0, SIZE(lista_sasiedztwa))
+	{
+		cout << lista_sasiedztwa[i][0].identyfikator << ": \t";
+		FOR(j, 1, SIZE(lista_sasiedztwa[i]))
+		{
+			cout << lista_sasiedztwa[i][j].identyfikator << " ";
+		}
+		cout << endl;
+	}
+	// -------------------------------------------------------------------------------------- //
+	// -------------------------------------------------------------------------------------- //
+	// -------------------------------------------------------------------------------------- //
+	// przeszukiwanie grafu i tworzenie sciezki
+	cout << endl << "Tworzenie sciezki startowej, nacisnij przycisk" << endl;
+	_getch();
+	//vector przechowujacy obecny cykl Hamiltona
+	vector<Punkt> sciezka = stworz_poczatkowa_sciezke(lista_sasiedztwa);
 
+	// dlugosc sciezki
+	double dlugosc = 0;
+	FOR(i, 0, SIZE(sciezka))
+	{
+		if (i + 1 > SIZE(sciezka)) dlugosc += odleglosc(sciezka[i], sciezka[0]);
+		else dlugosc += odleglosc(sciezka[i], sciezka[i + 1]);
+	}
+	cout << "DLUGOSC POCZATKOWA = " << dlugosc << endl;
+	// -------------------------------------------------------------------------------------- //
+	// -------------------------------------------------------------------------------------- //
+	// -------------------------------------------------------------------------------------- //
+
+
+
+	cout << "--------------- Wszystko zrobione ----------------" << endl;
 	_getch();
 	return 0;
-
-
-	/*
-	wypisz krawedzie grafu pelnego
-	FOR(i, 0, SIZE(graf_pelny))
-	{
-		cout << "ODL: " << graf_pelny[i].odleglosc << "\t\t";
-		cout << "ID1: " << graf_pelny[i].pierwszy.identyfikator << ", " << graf_pelny[i].pierwszy.x << " " << graf_pelny[i].pierwszy.y << "\t";
-		cout << "ID2: " << graf_pelny[i].drugi.identyfikator << ", " << graf_pelny[i].drugi.x << " " << graf_pelny[i].drugi.y << endl;
-	}
-
-	wypisz punkty
-	FOReq(i,1,liczba_wierzcholkow)
-	{
-		wierzcholki[i].wypisz_punkt();
-	}
-
-	wypisz MST
-	FOR(i, 0, SIZE(MST))
-	{
-		cout << MST[i].pierwszy.identyfikator << " ------> " << MST[i].drugi.identyfikator << endl;
-	}
-
-	*/
 }
-
+// odleglosc pomiedzy dwoma punktami w przestrzeni 2D
 double odleglosc(Punkt pierwszy, Punkt drugi)
 {
 	return sqrt(pow(drugi.y - pierwszy.y, 2) + pow(drugi.x - pierwszy.x, 2));
 }
+//porownanie dlugosci krawedzi
 bool porownaj_krawedzie(Krawedz pierwsza, Krawedz druga)
 {
 	if (druga.odleglosc > pierwsza.odleglosc) return 1;
 	else return 0;
 }
+//zwraca kat [-180,180] pomiedzy dwoma wektorami
 double kat_pomiedzy(Punkt pierwszy, Punkt drugi, Punkt trzeci)
 {
 	double wynik = (atan2(drugi.y - pierwszy.y, drugi.x - pierwszy.x) - atan2(trzeci.y - drugi.y, trzeci.x - drugi.x)) * 180 / PI;
 	if (wynik > 180) return wynik - 360;
 	return wynik;
 }
-/*
-zasada dzialania kat_pomiedzy:
-zwraca wartosc kata alfa e(-180,180) lezacego pomiedzy AB i BC (kat wewnetrzny)
-
-Punkt pierwszy = stworz_punkt(0, 5, 0);
-Punkt drugi = stworz_punkt(0, 1, 0);
-Punkt trzeci = stworz_punkt(0, 1, -4);
-
-cout << "KAT ROWNY: " << kat_pomiedzy(pierwszy, drugi, trzeci) << endl;
-
-for (double h = 0; h < 2 * PI; h += PI / 180)
+// tworzy z listy sasiedztwa cykl Hamiltona
+vector <Punkt> stworz_poczatkowa_sciezke(vector <vector<Punkt> > &lista_sasiedztwa)
 {
-trzeci.x = 5 * cos(h);
-trzeci.y = 5 * sin(h);
-cout << "KAT ROWNY: " << kat_pomiedzy(pierwszy, drugi, trzeci) << " h: " << h * 180 / PI << "\t";
-cout << trzeci.x << " " << trzeci.y << endl;
-}
+	int i, j;
+	vector <Punkt> sciezka;
+	stack <Krawedz> stos_sasiadow;
+	vector<Krawedz> wektor_sasiadow;
 
-*/
+	Punkt poprzedni = stworz_punkt(0, 0, 0),
+		obecny = lista_sasiedztwa[0][0];
+	sciezka.PB(obecny);
+
+	cout << "PEIRWSZY POPRZEDNI:" << endl;
+	poprzedni.wypisz_punkt();
+	cout << "PIERWSZY OBECNY:" << endl;
+	obecny.wypisz_punkt();
+
+	FOR(j, 1, SIZE(lista_sasiedztwa[0]))
+	{
+		wektor_sasiadow.PB(stworz_krawedz(poprzedni, obecny, lista_sasiedztwa[0][j]));
+	}
+
+	lista_sasiedztwa.erase(lista_sasiedztwa.begin());
+	FOR(j, 0, SIZE(lista_sasiedztwa))
+	{
+		FOR(i, 0, SIZE(lista_sasiedztwa[j]))
+		{
+			if (lista_sasiedztwa[j][i] == obecny) lista_sasiedztwa[j].erase(lista_sasiedztwa[j].begin() + i);
+		}
+	}
+
+	sort(wektor_sasiadow.begin(), wektor_sasiadow.end(), porownaj_krawedzie);
+	FOR(i, 0, SIZE(wektor_sasiadow))
+	{
+		stos_sasiadow.push(wektor_sasiadow[i]);
+	}
+	wektor_sasiadow.clear();
+
+	do
+	{
+		poprzedni = obecny;
+		obecny = stos_sasiadow.top().drugi;
+		//cout << "NOWY OBECNY:" << endl;
+		//obecny.wypisz_punkt();
+		//cout << "NOWY POPRZEDNI:" << endl;
+		//poprzedni.wypisz_punkt();
+		//cout << endl << endl;
+		sciezka.PB(obecny);
+		stos_sasiadow.pop();
+
+		// wyszukaj gdzie jest opisany obecny wierzcholek
+		FOR(i, 0, SIZE(lista_sasiedztwa))
+		{
+			if (lista_sasiedztwa[i][0] == obecny) break;
+		}
+		// do wektora sasiadow dodaj nowe krawedzie idace z obecnego do sasiada
+		FOR(j, 1, SIZE(lista_sasiedztwa[i]))
+		{
+			wektor_sasiadow.PB(stworz_krawedz(poprzedni, obecny, lista_sasiedztwa[i][j]));
+		}
+
+		lista_sasiedztwa.erase(lista_sasiedztwa.begin() + i);
+		FOR(j, 0, SIZE(lista_sasiedztwa))
+		{
+			FOR(i, 0, SIZE(lista_sasiedztwa[j]))
+			{
+				if (lista_sasiedztwa[j][i] == obecny) lista_sasiedztwa[j].erase(lista_sasiedztwa[j].begin() + i);
+			}
+		}
+
+		// posortuj je, wrzuc do stosu, wyczysc wektor sasiadow
+		sort(wektor_sasiadow.begin(), wektor_sasiadow.end(), porownaj_krawedzie);
+		FOR(i, 0, SIZE(wektor_sasiadow))
+		{
+			stos_sasiadow.push(wektor_sasiadow[i]);
+		}
+		wektor_sasiadow.clear();
+
+	} while (!stos_sasiadow.empty());
+
+	return sciezka;
+}
