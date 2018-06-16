@@ -18,8 +18,13 @@ bool operator==(Punkt lewy, Punkt prawy)
 {
 	return lewy.identyfikator == prawy.identyfikator;
 }
+bool operator!=(Punkt lewy, Punkt prawy)
+{
+	return lewy.identyfikator != prawy.identyfikator;
+}
 
 //----------------------------------------------- //
+
 // zwraca punkt o zadanym id oraz wspolrzednych
 Punkt stworz_punkt(int id, double a, double b)
 {

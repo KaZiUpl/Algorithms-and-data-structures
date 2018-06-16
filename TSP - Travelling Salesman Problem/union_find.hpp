@@ -13,7 +13,6 @@ class DS_node
 public:
 	int reprezentant, stopien;
 };
-
 class DS_struct
 {
 public: 
@@ -24,6 +23,7 @@ public:
 	int Find(int v);
 	void Union(Edge e);
 };
+
 DS_struct::DS_struct(int ilosc_wierzcholkow)
 {
 	vector<DS_node> _temp(ilosc_wierzcholkow);

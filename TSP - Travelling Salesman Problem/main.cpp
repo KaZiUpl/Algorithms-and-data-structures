@@ -25,7 +25,6 @@ double kat_pomiedzy(Punkt pierwszy, Punkt drugi, Punkt trzeci);
 vector <Punkt> stworz_poczatkowa_sciezke(vector <vector<Punkt> > &);
 void algorytm_2_opt(vector<Punkt> &);
 
-
 int main()
 {
 	// zmienne
@@ -33,7 +32,6 @@ int main()
 	int num_wierzcholka, wspol_x, wspol_y;
 	// zmienne iteracyjne
 	int i, j;
-
 	// podawanie liczby wierzcholkow w grafie, tworzenie wektora na wierzcholki
 	cin >> liczba_wierzcholkow;
 	// vector wierzcholkow
@@ -58,8 +56,8 @@ int main()
 		}
 	}
 
-	cout << "Tworzenie krawedzi zakonczone, wcisnij Enter aby stworzyc MST" << endl;
-	_getch();
+	/*cout << "Tworzenie krawedzi zakonczone, wcisnij Enter aby stworzyc MST" << endl;
+	_getch();*/
 
 	// sortowanie krawedzi wedlug dlugosci
 	sort(graf_pelny.begin(), graf_pelny.end(), porownaj_krawedzie);
@@ -69,7 +67,6 @@ int main()
 
 	//struktura zbiorow rozlacznych zawierajaca wszystkie wierzcholki
 	DS_struct zbior_rozlaczny(liczba_wierzcholkow + 1);
-
 	FOR(i, 1, liczba_wierzcholkow + 1)
 	{
 		zbior_rozlaczny.Make_set(i);
@@ -100,15 +97,14 @@ int main()
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
-
-	cout << endl << "MST stworzone, wcisnij dowolny klawisz, aby wypisac MST i skasowac graf pelny" << endl;
-	_getch();
+	/*cout << endl << "MST stworzone, wcisnij dowolny klawisz, aby wypisac MST i skasowac graf pelny" << endl;
+	_getch();*/
 
 	// kasowanie grafu pelnego
 	vector<Krawedz>().swap(graf_pelny);
 
-	cout << endl << "Tworzenie listy sasiedztwa, nacisnij przycisk" << endl;
-	_getch();
+	/*cout << endl << "Tworzenie listy sasiedztwa, nacisnij przycisk" << endl;
+	_getch();*/
 	// lista sasiedztwa dla MST
 	vector<vector<Punkt> > lista_sasiedztwa;
 	// pierwszy przebieg dodaje wierzcholki startowe i koncowe
@@ -154,7 +150,7 @@ int main()
 		}
 	}
 	// wypisywanie listy sasiedztwa
-	FOR(i, 0, SIZE(lista_sasiedztwa))
+	/*FOR(i, 0, SIZE(lista_sasiedztwa))
 	{
 		cout << lista_sasiedztwa[i][0].identyfikator << ": \t";
 		FOR(j, 1, SIZE(lista_sasiedztwa[i]))
@@ -162,29 +158,43 @@ int main()
 			cout << lista_sasiedztwa[i][j].identyfikator << " ";
 		}
 		cout << endl;
-	}
+	}*/
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
 	// przeszukiwanie grafu i tworzenie sciezki
-	cout << endl << "Tworzenie sciezki startowej, nacisnij przycisk" << endl;
-	_getch();
+	/*cout << endl << "Tworzenie sciezki startowej, nacisnij przycisk" << endl;
+	_getch();*/
 	//vector przechowujacy obecny cykl Hamiltona
 	vector<Punkt> sciezka = stworz_poczatkowa_sciezke(lista_sasiedztwa);
-
 	// dlugosc sciezki
 	double dlugosc = 0;
+	cout << "SCIEZKA: ";
 	FOR(i, 0, SIZE(sciezka))
 	{
-		if (i + 1 > SIZE(sciezka)) dlugosc += odleglosc(sciezka[i], sciezka[0]);
-		else dlugosc += odleglosc(sciezka[i], sciezka[i + 1]);
+		dlugosc += odleglosc(sciezka[i], sciezka[i + 1]);
+		cout << sciezka[i].identyfikator << " ";
 	}
+	cout << endl;
+	dlugosc += odleglosc(sciezka[i], sciezka[0]);
 	cout << "DLUGOSC POCZATKOWA = " << dlugosc << endl;
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
+	/*cout << endl << "Optymalizacja sciezki, nacisnij przycisk" << endl;
+	_getch();*/
 
-
+	algorytm_2_opt(sciezka);
+	dlugosc = 0;
+	cout << "Sciezka koncowa: " << endl;
+	FOR(i, 0, SIZE(sciezka))
+	{
+		dlugosc += odleglosc(sciezka[i], sciezka[i + 1]);
+		cout << sciezka[i].identyfikator << " ";
+	}
+	cout << endl;
+	dlugosc += odleglosc(sciezka[i], sciezka[0]);
+	cout << "DLUGOSC KONCOWA = " << dlugosc << endl;
 
 	cout << "--------------- Wszystko zrobione ----------------" << endl;
 	_getch();
@@ -219,11 +229,6 @@ vector <Punkt> stworz_poczatkowa_sciezke(vector <vector<Punkt> > &lista_sasiedzt
 	Punkt poprzedni = stworz_punkt(0, 0, 0),
 		obecny = lista_sasiedztwa[0][0];
 	sciezka.PB(obecny);
-
-	cout << "PEIRWSZY POPRZEDNI:" << endl;
-	poprzedni.wypisz_punkt();
-	cout << "PIERWSZY OBECNY:" << endl;
-	obecny.wypisz_punkt();
 
 	FOR(j, 1, SIZE(lista_sasiedztwa[0]))
 	{
@@ -289,4 +294,43 @@ vector <Punkt> stworz_poczatkowa_sciezke(vector <vector<Punkt> > &lista_sasiedzt
 	} while (!stos_sasiadow.empty());
 
 	return sciezka;
+}
+// algorytm 2-OPT polepszajacy zadana sciezke
+void algorytm_2_opt(vector<Punkt> & sciezka)
+{
+	int i, j;
+	Punkt pierwszy, drugi, trzeci, czwarty;
+	bool czy_byla_poprawka = true;
+	// przegladanie sciezki w poszukiwaniu kandydata na zamiane
+	// wybieranie pierwszego kandydata
+	while (czy_byla_poprawka)
+	{
+		czy_byla_poprawka = false;
+		FOR(i, 0, SIZE(sciezka))
+		{
+			pierwszy = sciezka[i];
+			if (pierwszy == sciezka[SIZE(sciezka) - 1]) drugi = sciezka[0];
+			else drugi = sciezka[i + 1];
+			// wybieranie drugiego kandydata
+			FOR(j, i + 2, SIZE(sciezka))
+			{
+				// jesli drugi krawedz sie nie laczy z kandydatem to wybierz ja
+				if (sciezka[j] != pierwszy && sciezka[j] != drugi && sciezka[(j + 1) % SIZE(sciezka)] != pierwszy)
+				{
+					trzeci = sciezka[j];
+					czwarty = sciezka[(j + 1) % SIZE(sciezka)];
+				}
+				else continue;
+				// zobacz, czy sie krzyzuja
+				if (odleglosc(pierwszy, drugi) + odleglosc(trzeci, czwarty) > odleglosc(pierwszy, trzeci) + odleglosc(drugi, czwarty))
+				{
+					czy_byla_poprawka = true;
+					// zamiana kolejnosci sciezki
+					// ---------------------------
+					reverse(sciezka.begin() + i + 1, sciezka.begin() + j + 1);
+				}
+				else continue;
+			}
+		}
+	}
 }

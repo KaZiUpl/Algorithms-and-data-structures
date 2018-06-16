@@ -20,6 +20,7 @@ void Krawedz::wypisz_krawedz()
 }
 
 //----------------------------------------------- //
+
 // zwraca krawedz o koncach w zadanych punktach
 Krawedz stworz_krawedz(Punkt start, Punkt koniec)
 {
