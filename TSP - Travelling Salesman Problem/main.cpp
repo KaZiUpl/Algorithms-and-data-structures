@@ -170,6 +170,7 @@ int main()
 	{
 		dlugosc += odleglosc(sciezka[i], sciezka[i + 1]);
 		//cout << sciezka[i].identyfikator << " ";
+		//if(i%20 == 0) cout<<endl;
 	}
 	cout << endl;
 	dlugosc += odleglosc(sciezka[SIZE(sciezka) - 1], sciezka[0]);
@@ -187,6 +188,7 @@ int main()
 	{
 		dlugosc += odleglosc(sciezka[i], sciezka[i + 1]);
 		cout << sciezka[i].identyfikator << " ";
+		if (i % 21 == 20) cout << endl;
 	}
 	cout << endl;
 	dlugosc += odleglosc(sciezka[SIZE(sciezka) - 1], sciezka[0]);
