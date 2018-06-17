@@ -165,12 +165,12 @@ int main()
 
 	// dlugosc sciezki
 	double dlugosc = 0;
-	//cout << "SCIEZKA POCZATKOWA: ";
+	cout << "SCIEZKA POCZATKOWA: ";
 	FOR(i, 0, SIZE(sciezka))
 	{
 		dlugosc += odleglosc(sciezka[i], sciezka[i + 1]);
-		//cout << sciezka[i].identyfikator << " ";
-		//if(i%20 == 0) cout<<endl;
+		cout << sciezka[i].identyfikator << " ";
+		if(i%20 == 0) cout<<endl;
 	}
 	cout << endl;
 	dlugosc += odleglosc(sciezka[SIZE(sciezka) - 1], sciezka[0]);
