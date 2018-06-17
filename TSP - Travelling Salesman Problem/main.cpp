@@ -22,6 +22,7 @@ using namespace std;
 double odleglosc(Punkt, Punkt);
 bool porownaj_krawedzie(Krawedz, Krawedz);
 double kat_pomiedzy(Punkt pierwszy, Punkt drugi, Punkt trzeci);
+vector<Punkt> najblizszy_sasiad(vector<Punkt>);
 vector <Punkt> stworz_poczatkowa_sciezke(vector <vector<Punkt> > &);
 void algorytm_2_opt(vector<Punkt> &);
 
@@ -55,9 +56,6 @@ int main()
 			graf_pelny.PB(stworz_krawedz(wierzcholki[i], wierzcholki[j]));
 		}
 	}
-
-	/*cout << "Tworzenie krawedzi zakonczone, wcisnij Enter aby stworzyc MST" << endl;
-	_getch();*/
 
 	// sortowanie krawedzi wedlug dlugosci
 	sort(graf_pelny.begin(), graf_pelny.end(), porownaj_krawedzie);
@@ -97,14 +95,10 @@ int main()
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
-	/*cout << endl << "MST stworzone, wcisnij dowolny klawisz, aby wypisac MST i skasowac graf pelny" << endl;
-	_getch();*/
 
 	// kasowanie grafu pelnego
 	vector<Krawedz>().swap(graf_pelny);
 
-	/*cout << endl << "Tworzenie listy sasiedztwa, nacisnij przycisk" << endl;
-	_getch();*/
 	// lista sasiedztwa dla MST
 	vector<vector<Punkt> > lista_sasiedztwa;
 	// pierwszy przebieg dodaje wierzcholki startowe i koncowe
@@ -163,40 +157,42 @@ int main()
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
 	// przeszukiwanie grafu i tworzenie sciezki
-	/*cout << endl << "Tworzenie sciezki startowej, nacisnij przycisk" << endl;
-	_getch();*/
+
 	//vector przechowujacy obecny cykl Hamiltona
-	vector<Punkt> sciezka = stworz_poczatkowa_sciezke(lista_sasiedztwa);
+	vector<Punkt> sciezka;
+
+	sciezka = najblizszy_sasiad(wierzcholki);
+
 	// dlugosc sciezki
 	double dlugosc = 0;
-	cout << "SCIEZKA: ";
+	//cout << "SCIEZKA POCZATKOWA: ";
 	FOR(i, 0, SIZE(sciezka))
 	{
 		dlugosc += odleglosc(sciezka[i], sciezka[i + 1]);
-		cout << sciezka[i].identyfikator << " ";
+		//cout << sciezka[i].identyfikator << " ";
 	}
 	cout << endl;
-	dlugosc += odleglosc(sciezka[i], sciezka[0]);
+	dlugosc += odleglosc(sciezka[SIZE(sciezka) - 1], sciezka[0]);
 	cout << "DLUGOSC POCZATKOWA = " << dlugosc << endl;
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
 	// -------------------------------------------------------------------------------------- //
-	/*cout << endl << "Optymalizacja sciezki, nacisnij przycisk" << endl;
-	_getch();*/
+	// algorytm 2-opt
 
 	algorytm_2_opt(sciezka);
 	dlugosc = 0;
-	cout << "Sciezka koncowa: " << endl;
+	cout << "SCIEZKA KONCOWA: " << endl;
+	// wypisywanie sciezki koncowej
 	FOR(i, 0, SIZE(sciezka))
 	{
 		dlugosc += odleglosc(sciezka[i], sciezka[i + 1]);
 		cout << sciezka[i].identyfikator << " ";
 	}
 	cout << endl;
-	dlugosc += odleglosc(sciezka[i], sciezka[0]);
+	dlugosc += odleglosc(sciezka[SIZE(sciezka) - 1], sciezka[0]);
 	cout << "DLUGOSC KONCOWA = " << dlugosc << endl;
 
-	cout << "--------------- Wszystko zrobione ----------------" << endl;
+	cout << endl << "--------------- Wszystko zrobione ----------------" << endl;
 	_getch();
 	return 0;
 }
@@ -217,6 +213,36 @@ double kat_pomiedzy(Punkt pierwszy, Punkt drugi, Punkt trzeci)
 	double wynik = (atan2(drugi.y - pierwszy.y, drugi.x - pierwszy.x) - atan2(trzeci.y - drugi.y, trzeci.x - drugi.x)) * 180 / PI;
 	if (wynik > 180) return wynik - 360;
 	return wynik;
+}
+// tworzy cykl Hamiltona metoda najblizszego sasiada
+vector<Punkt> najblizszy_sasiad(vector<Punkt> wierzcholki)
+{
+	vector<Punkt> sciezka;
+	Punkt najblizszy;
+	double minimalna_odleglosc;
+	int i, indeks_najblizszego;
+
+	sciezka.PB(wierzcholki[0]);
+	wierzcholki.erase(wierzcholki.begin());
+
+	while (SIZE(wierzcholki) > 0)
+	{
+		najblizszy = wierzcholki[0];
+		minimalna_odleglosc = odleglosc(sciezka[SIZE(sciezka) - 1], najblizszy);
+		indeks_najblizszego = 0;
+		FOR(i, 1, SIZE(wierzcholki))
+		{
+			if (odleglosc(sciezka[SIZE(sciezka) - 1], wierzcholki[i]) < minimalna_odleglosc)
+			{
+				najblizszy = wierzcholki[i];
+				minimalna_odleglosc = odleglosc(sciezka[SIZE(sciezka) - 1], wierzcholki[i]);
+				indeks_najblizszego = i;
+			}
+		}
+		sciezka.PB(najblizszy);
+		wierzcholki.erase(wierzcholki.begin() + indeks_najblizszego);
+	}
+	return sciezka;
 }
 // tworzy z listy sasiedztwa cykl Hamiltona
 vector <Punkt> stworz_poczatkowa_sciezke(vector <vector<Punkt> > &lista_sasiedztwa)
@@ -328,6 +354,14 @@ void algorytm_2_opt(vector<Punkt> & sciezka)
 					// zamiana kolejnosci sciezki
 					// ---------------------------
 					reverse(sciezka.begin() + i + 1, sciezka.begin() + j + 1);
+					/*double dlugosc = 0;
+					int h;
+					FOR(h, 0, SIZE(sciezka))
+					{
+						dlugosc += odleglosc(sciezka[h], sciezka[h + 1]);
+					}
+					dlugosc += odleglosc(sciezka[SIZE(sciezka) - 1], sciezka[0]);
+					cout << "Poprawiono dlugosc na " << dlugosc << endl;*/
 				}
 				else continue;
 			}
